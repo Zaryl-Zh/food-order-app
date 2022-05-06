@@ -32,7 +32,13 @@ const DATA = [
 
 const AvailableMeals = () => {
     const mealsList = DATA.map(meal => (
-        <MealItem key={meal.id} name={meal.name} description={meal.description} price={meal.price}/>
+        <MealItem 
+            id={meal.id} 
+            key={meal.id} 
+            name={meal.name} 
+            description={meal.description} 
+            price={meal.price}
+        />
     )
     )
 
