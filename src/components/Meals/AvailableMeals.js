@@ -1,37 +1,55 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from '../UI/Card'
 import classes from './AvailableMeals.module.css'
 import MealItem from './MealItem'
 
-const DATA = [
-    {
-       id: 'm1',
-       name: 'Sushi',
-       description: 'Finest fish with veggies',
-       price: 22.99 
-    },
-    {
-        id: 'm2',
-        name: 'Schnitzel',
-        description: 'A german speciality',
-        price: 16.5 
-     },
-     {
-        id: 'm3',
-        name: 'Pizza',
-        description: 'Finest fish with veggies',
-        price: 22.99 
-     },
-     {
-        id: 'm4',
-        name: 'Burger',
-        description: 'Finest fish with veggies',
-        price: 22.99 
-     }
-]
 
 const AvailableMeals = () => {
-    const mealsList = DATA.map(meal => (
+  const [meals, setMeals] = useState([])
+  const [isLoading, setIsLoading] = useState(true);
+  const [httpError, setHttpError] = useState(null);
+  useEffect(() => {
+    const fetchMeals = async() => {
+      const response = await fetch('https://food-order-fetch-default-rtdb.firebaseio.com/meals.json') 
+        if(!response.ok) {
+          throw new Error('something went wrong!')
+        }
+
+      const responseData = await response.json();
+
+      const loadedMeals = [];
+
+      for(const key in responseData) {
+        loadedMeals.push({
+          id: key,
+          name: responseData[key].name,
+          description: responseData[key].description,
+          price: responseData[key].price
+        })
+      }
+      setMeals(loadedMeals)
+      setIsLoading(false);
+      }
+
+      fetchMeals().catch(err => {
+        setIsLoading(false)
+        setHttpError(err.message)
+      });
+  }, [])
+
+  if(isLoading) {
+    return <section className={classes.MealsLoading}>
+      <p>Loading...</p>
+    </section>
+  }
+
+  if(httpError) {
+    return <section className={classes.MealsLoading}>
+    <p>{httpError}</p>
+  </section>
+  }
+
+    const mealsList = meals.map(meal => (
         <MealItem 
             id={meal.id} 
             key={meal.id} 
@@ -54,4 +72,4 @@ const AvailableMeals = () => {
   )
 }
 
-export default AvailableMeals
+export default AvailableMeals  
